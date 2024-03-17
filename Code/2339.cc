@@ -52,7 +52,7 @@ void GetResult() {
 }
 
 int recur(int square_cord[], bool iscolumn) {
-    if (square_cord[0] < 0 || square_cord[1] < 0 || square_cord[2] < 0 || square_cord[3] < 0)
+    if ((square_cord[0] > square_cord[1]) || (square_cord[2] > square_cord[3]))
         return 1;
 
     vector<cord> included_jewel;
@@ -94,30 +94,29 @@ int recur(int square_cord[], bool iscolumn) {
     if ((included_jewel.size() == 1) && (included_impurity.size() == 0))
         return 1;
 
-    if (included_jewel.size() == (included_impurity.size() + 1)){
-        for (int i = 0; i < included_impurity.size(); i++){
-            int leftside, rightside;
-            if (isin[included_impurity[i]] == true)
-                continue;
-            
-            if (iscolumn){
-                int left_cord[] = {square_cord[0], square_cord[1], square_cord[2], included_impurity[i] - 1};
-                int right_cord[] = {square_cord[0], square_cord[1], included_impurity[i] + 1, square_cord[3]};
-                leftside = recur(left_cord, !iscolumn);
-                rightside = recur(right_cord, !iscolumn);
-            }
-            else {
-                int left_cord[] = {square_cord[0], included_impurity[i] - 1, square_cord[2], square_cord[3]};
-                int right_cord[] = {included_impurity[i] + 1, square_cord[1], square_cord[2], square_cord[3]};
-                leftside = recur(left_cord, !iscolumn);
-                rightside = recur(right_cord, !iscolumn);
-            }
+    if ((included_jewel.size() >= 2 && included_impurity.size() == 0) || (included_jewel.size() == 0))
+        return 0;
 
-            ret += (leftside * rightside);
+    for (int i = 0; i < included_impurity.size(); i++){
+        int leftside, rightside;
+        if (isin[included_impurity[i]] == true)
+            continue;
+        
+        if (iscolumn){
+            int left_cord[] = {square_cord[0], square_cord[1], square_cord[2], included_impurity[i] - 1};
+            leftside = recur(left_cord, !iscolumn);
+            int right_cord[] = {square_cord[0], square_cord[1], included_impurity[i] + 1, square_cord[3]};
+            rightside = recur(right_cord, !iscolumn);
+        }
+        else {
+            int left_cord[] = {square_cord[0], included_impurity[i] - 1, square_cord[2], square_cord[3]};
+            leftside = recur(left_cord, !iscolumn);
+            int right_cord[] = {included_impurity[i] + 1, square_cord[1], square_cord[2], square_cord[3]};
+            rightside = recur(right_cord, !iscolumn);
         }
 
-        return ret;
+        ret += (leftside * rightside);
     }
-    else
-        return 0;
+
+    return ret;
 }
